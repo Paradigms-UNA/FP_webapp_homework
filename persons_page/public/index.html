@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<!--
+* Fake page
+@author loricarlos@gmail.com
+@version demo
+-->
+<html>
+    <head>
+        <title>Persons WebApp</title>
+        <link rel="icon" type="image/x-icon" href="favicon.ico"/>
+    </head>
+    <body>
+        <h1>Fake Index Page</h1>
+        <h2>Persons Application</h2>
+        <button id="button_persons">Click to view Persons</button>
+        <div id="idblock" name="idblock">
+            <label for="id">Id</label>
+            <input type="number" id="id" name="id" value="01" min="00" size="2" style="width: 2em;">
+        <div>
+        <div id="controls" name="controls">
+            <select name="genders" id="genders">
+                <option value="all">All</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+            </select>
+            
+            <select name="age" id="age">
+                <option value="all">All</option>
+                <option value="child">Child(&lt; 11)</option>
+                <option value="teenager">Tenager(12-20)</option>
+                <option value="adult">Adult(21-64)</option>
+                <option value="senior">Senior(&gt; 64)</option>
+                
+            </select>
+            <div id="persons" name="persons">
+                <table id="table"></table>
+            </div>
+        </div>
+
+        <script type="module" src="./js/main.js"></script>
+    </body>
+</html>
