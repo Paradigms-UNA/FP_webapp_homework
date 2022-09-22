@@ -40,6 +40,8 @@ class Person {
     }
 }
 const persons = data.persons.map(person => new Person(person.firstname, person.lastname, person.age, person.gender))
+
+
 export function get_persons(url = "/person", delay = 3) {
     let p = new Promise(
         then => setTimeout(() => then(JSON.stringify(persons.map(p => p.toObj())),
@@ -47,4 +49,42 @@ export function get_persons(url = "/person", delay = 3) {
         )
     )
     return p
-}   
+}
+
+
+const person_filter = (person, queryOptions) => {
+    if (queryOptions.ageRange) {
+        if (
+            person.age <= queryOptions.ageRange.min ||
+            person.age >= queryOptions.ageRange.max
+        ) {
+            return false;
+        } 
+    } else if (queryOptions.gender) {
+        if (person.gender !== queryOptions.gender) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+function toPromise(arr, delay = 3) {
+    let p = new Promise(
+        then => setTimeout(() => then(JSON.stringify(arr.map(p => p.toObj())),
+            delay % 1000 * 1000)
+        )
+    )
+    return p
+}
+
+
+export function getPersonsBySelection(URI = "/person", queryOptions, delay = 3) {
+    let filtered_persons = persons.filter((person) => person_filter(person, queryOptions));
+    return toPromise(filtered_persons);
+}
+
+export function getPersonById(URI = "/person", id) {
+    let person = persons.find(p => p.id === id);
+    return toPromise([person]);
+}
