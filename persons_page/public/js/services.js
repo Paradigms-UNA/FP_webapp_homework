@@ -43,33 +43,17 @@ const persons = data.persons.map(person => new Person(person.firstname, person.l
 
 
 export function get_persons(url = "/person", delay = 3) {
-    let p = new Promise(
-        then => setTimeout(() => then(JSON.stringify(persons.map(p => p.toObj())),
-            delay % 1000 * 1000)
-        )
-    )
-    return p
+    return to_promise(persons, delay);
 }
 
-
-const person_filter = (person, queryOptions) => {
-    if (queryOptions.ageRange) {
-        if (
-            person.age <= queryOptions.ageRange.min ||
-            person.age >= queryOptions.ageRange.max
-        ) {
-            return false;
-        } 
-    } else if (queryOptions.gender) {
-        if (person.gender !== queryOptions.gender) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-function toPromise(arr, delay = 3) {
+/**
+ * Receives an array of objects Person and stringifies it inside a promise.
+ * 
+ * @param {*} arr 
+ * @param {*} delay 
+ * @returns a Promise which resolvees into the stringified array of persons.
+ */
+function to_promise(arr, delay = 3) {
     let p = new Promise(
         then => setTimeout(() => then(JSON.stringify(arr.map(p => p.toObj())),
             delay % 1000 * 1000)
@@ -78,13 +62,37 @@ function toPromise(arr, delay = 3) {
     return p
 }
 
+/**
+ * This function tests wheter a single person meets the requirements
+ * inside the queryOptions object. If any of the queryOptions is NULL
+ * then the test is considered passed.
+ * 
+ * @param {*} person 
+ * @param {*} queryOptions {ageRange: {min: number, max: number}, gender: number }
+ * @returns 
+ */
+
+const person_filter = (person, queryOptions) => {
+    if (queryOptions.ageRange) {
+        if ( person.age <= queryOptions.ageRange.min || person.age >= queryOptions.ageRange.max )  
+        return false;
+    }
+    if (queryOptions.gender) {
+        if (person.gender !== queryOptions.gender) {
+            return false;
+        }
+    }
+    return true;
+}
+
+
 
 export function getPersonsBySelection(URI = "/person", queryOptions, delay = 3) {
     let filtered_persons = persons.filter((person) => person_filter(person, queryOptions));
-    return toPromise(filtered_persons);
+    return to_promise(filtered_persons);
 }
 
 export function getPersonById(URI = "/person", id) {
     let person = persons.find(p => p.id === id);
-    return toPromise([person]);
+    return to_promise([person]);
 }

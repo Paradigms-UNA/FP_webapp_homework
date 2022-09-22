@@ -23,99 +23,90 @@ const generate_trs = (object_array) =>
         }, document.createElement("tr"))
     );
 
+
+
+
 function view_persons(URI = DEFAULT_URI) {
-    const persons_tag = document.getElementById(PERSONS_TAG);
     get_persons(URI)
         .then((persons) => {
             // Remove last table inside the PERSONS_TAG.
-            let table_body = persons_tag.querySelector("table").querySelector("tbody");
-            table_body.innerHTML = "";
-            // Create a new one to be populated
-            generate_trs(JSON.parse(persons))
-                //Append each tr of the generated array to the table.
-                .forEach((tr) => table_body.appendChild(tr));
+            render_persons(persons);
         })
         .catch((err) => alert(err));
 }
 
 
+function render_persons(persons) {
+    const persons_tag = document.getElementById(PERSONS_TAG);
+    let table_body = persons_tag.querySelector("table").querySelector("tbody");
+    table_body.innerHTML = "";
+    // Create a new one to be populated
+    generate_trs(JSON.parse(persons))
+        //Append each tr of the generated array to the table.
+        .forEach((tr) => table_body.appendChild(tr));
+}
+
 function get_queryOptions() {
-    
+
     let queryOptions = {};
-    
+
     // First getting the gender
     let gender = document.getElementById(BUTTON_SELECT_GENDER).value;
 
-    if(gender === 'all') queryOptions.gender = null;
+    if (gender === 'all') queryOptions.gender = null;
     else queryOptions.gender = parseInt(gender);
 
 
     //Secondly get the age
     let ageSelection = document.getElementById(BUTTON_SELECT_AGE).value;
-    switch(ageSelection) {
-        case "child": queryOptions.ageRange = {min: 0, max: 11}; break;
-        case "teenager": queryOptions.ageRange = {min: 12, max: 20}; break;
-        case "adult": queryOptions.ageRange = {min: 21, max: 63}; break;
-        case "senior": queryOptions.ageRange = {min: 64, max: 122}; break;
+    switch (ageSelection) {
+        case "child": queryOptions.ageRange = { min: 0, max: 11 }; break;
+        case "teenager": queryOptions.ageRange = { min: 12, max: 20 }; break;
+        case "adult": queryOptions.ageRange = { min: 21, max: 63 }; break;
+        case "senior": queryOptions.ageRange = { min: 64, max: 122 }; break;
         default: queryOptions.ageRange = null;
     }
-    
+
     return queryOptions;
 }
 
 
-function filter_person(URI = DEFAULT_URI) {
+function filter_person(event, URI = DEFAULT_URI) {
+    event.preventDefault();
     let queryOptions = get_queryOptions();
-    const persons_tag = document.getElementById(PERSONS_TAG);
     getPersonsBySelection(URI, queryOptions)
         .then((persons) => {
-            // Remove last table inside the PERSONS_TAG.
-            let table_body = persons_tag.querySelector("table").querySelector("tbody");
-            table_body.innerHTML = "";
-            // Create a new one to be populated
-            generate_trs(JSON.parse(persons))
-                //Append each tr of the generated array to the table.
-                .forEach((tr) => table_body.appendChild(tr));
+            render_persons(persons);
         })
         .catch((err) => alert(err));
 }
 
 function filter_by_id(event, URI = DEFAULT_URI) {
+    event.preventDefault();
     const persons_tag = document.getElementById(PERSONS_TAG);
     getPersonById(URI, parseInt(event.target.value))
         .then((persons) => {
-            // Remove last table inside the PERSONS_TAG.
-            let table_body = persons_tag.querySelector("table").querySelector("tbody");
-            table_body.innerHTML = "";
-            // Create a new one to be populated
-            generate_trs(JSON.parse(persons))
-                //Append each tr of the generated array to the table.
-                .forEach((tr) => table_body.appendChild(tr));
+            render_persons(persons);
         })
         .catch((err) => alert(err));
 }
 
 
-document.addEventListener('DOMContentLoaded', () => {
-
+// Wait after the DOM is completely built to bind listeners.
+document.addEventListener('DOMContentLoaded', e => {
+    
+    e.preventDefault();
     // Bind button
     const button_tag = document.getElementById(BUTTONS_TAG);
     button_tag.addEventListener("click", view_persons, false);
 
 
-    // Filters for queryOptions
-    const select_gender = document.getElementById(BUTTON_SELECT_GENDER);
-    const select_age = document.getElementById(BUTTON_SELECT_AGE);
-
+    
     // Binding Selects
-    select_gender.addEventListener("change", filter_person);
-    select_age.addEventListener("change", filter_person);
+    document.getElementById(BUTTON_SELECT_GENDER).addEventListener("change", filter_person);
+    document.getElementById(BUTTON_SELECT_AGE).addEventListener("change", filter_person);
 
-    // We declare the ID input and then bind it
-    const input_id = document.getElementById(INPUT_ID);
-    input_id.addEventListener("change", filter_by_id);
+    //Binding the id input
+    document.getElementById(INPUT_ID).addEventListener("change", filter_by_id);
+    
 });
-
-
-
-//getPersonsBySelection(URI:"/person", {queryOptions: {ageRange: {min:number, max:number}, gender:string}} )
