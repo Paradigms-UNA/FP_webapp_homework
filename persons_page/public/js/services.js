@@ -62,6 +62,25 @@ function to_promise(arr, delay = 3) {
     return p
 }
 
+// TRUE Function
+const True = person => true
+
+//Combinator of functions
+const apply_filters = (queryOptions, ...filters) => filters.reduce( 
+    (prev_filters, current_filter) => person => 
+        prev_filters(person, queryOptions) && current_filter(person, queryOptions), True)
+
+
+const apply_filters2 = (...filters) => queryOptions => filters.reduce(
+    (prev_filters, current_filter) => 
+        person => prev_filters(person, queryOptions) && current_filter(person, queryOptions), True)
+
+// Gender - filter
+const gender_filter = (person, {gender}) => gender ? person.gender === gender : true
+
+// Age - filter
+const age_filter = (person, {ageRange}) => ageRange ? person.age >= ageRange.min && person.age <= ageRange.max : true
+
 /**
  * This function tests wheter a single person meets the requirements
  * inside the queryOptions object. If any of the queryOptions is NULL
@@ -72,23 +91,23 @@ function to_promise(arr, delay = 3) {
  * @returns 
  */
 
-const person_filter = (person, queryOptions) => {
-    if (queryOptions.ageRange) {
-        if ( person.age <= queryOptions.ageRange.min || person.age >= queryOptions.ageRange.max )  
-        return false;
-    }
-    if (queryOptions.gender) {
-        if (person.gender !== queryOptions.gender) {
-            return false;
-        }
-    }
-    return true;
-}
+// const person_filter = (person, queryOptions) => {
+//     if (queryOptions.ageRange) {
+//         if ( person.age <= queryOptions.ageRange.min || person.age >= queryOptions.ageRange.max )  
+//         return false;
+//     }
+//     if (queryOptions.gender) {
+//         if (person.gender !== queryOptions.gender) {
+//             return false;
+//         }
+//     }
+//     return true;
+// }
 
 
 
 export function getPersonsBySelection(URI = "/person", queryOptions, delay = 3) {
-    let filtered_persons = persons.filter((person) => person_filter(person, queryOptions));
+    let filtered_persons = persons.filter(apply_filters2(gender_filter, age_filter)(queryOptions));
     return to_promise(filtered_persons);
 }
 
